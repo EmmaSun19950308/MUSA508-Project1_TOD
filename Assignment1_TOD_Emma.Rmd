@@ -1,5 +1,5 @@
 ---
-title: "Assignment1_TOD"
+title: "Assignment1: TOD Study in Dallas, Texas"
 author: "Emma Sun"
 date: "9/18/2020"
 output:
@@ -8,11 +8,13 @@ output:
 ---
 
 # I. Introduction & Motivation
-hahahahahahah
+
+
+
 
 # II. Setup: Set parameters and load libraries
 ### 1. Load Libraries
-```{r Setup, include=FALSE}
+```{r Setup, echo=TRUE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 options(scipen=999)
 
@@ -73,7 +75,7 @@ plotTheme <- function(base_size = 12) {
 ```
 
 ### 3. Functions Preparation
-```{r Quantile Break, include=FALSE}
+```{r Quantile Break, echo=TRUE, message=FALSE, warning=FALSE}
 
 qBr <- function(df, variable, rnd) {
   if (missing(rnd)) {
@@ -176,9 +178,9 @@ palette5 <- c("#CCCCFF","#CC99FF","#9966CC","#663399","#330066")
 ### Load Census API key
 ```{r Other setup}
 knitr::opts_chunk$set(
+	echo = TRUE,
 	message = FALSE,
-	warning = FALSE,
-	include = FALSE
+	warning = FALSE
 )
 census_api_key("a7edab3d7c3df571998caab5a3cc12a4ec8d8b61" , overwrite  = TRUE)
 
@@ -188,7 +190,7 @@ census_api_key("a7edab3d7c3df571998caab5a3cc12a4ec8d8b61" , overwrite  = TRUE)
 # III. Data Manipulation and Visualization
 ## 1. Data Wrangling
 ### 1.1 Fetch Census Data
-```{r Census Data, echo=TRUE, message=FALSE, warning=FALSE}
+```{r Census Data, message=FALSE, warning=FALSE}
 # View(load_variables(2009,'acs5',cache = TRUE))
 
 tracts09 <-  
@@ -664,7 +666,7 @@ ggplot(allTracts.group)+
 
 
 
-# IV. Conclusion
+# IV. Conclusion and Recommandation
 
 
 

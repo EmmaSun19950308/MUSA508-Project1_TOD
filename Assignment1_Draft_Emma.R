@@ -643,11 +643,11 @@ mean_RENT <- allTracts.rings %>%
 
 ggplot(data = mean_RENT) +
   geom_line(aes(x = distance, y = mean_RENT, col = year), size = 2) + 
-  geom_point(aes(x = distance, y = mean_RENT, col = year)) + 
+  geom_point(aes(x = distance, y = mean_RENT, col = year) , size = 4) + 
   labs(title = " Rent as a function of distance to subway stations",
        subtitle = '',
        caption = 'Figure 6.1') +
-  scale_color_manual(values = c('darkblue','green'),
+  scale_color_manual(values = c('#5f829e','#fab18e'),
                      name = 'Year') +
   theme(legend.position = "right") +
   xlab("Distance to Stations, Miles") + 
