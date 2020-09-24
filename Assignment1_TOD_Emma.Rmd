@@ -2,9 +2,9 @@
 title: "Assignment1: TOD Study in Dallas, Texas"
 author: "Emma Sun"
 date: "9/18/2020"
-output:
-  html_document: default
-  word_document: default
+output: 
+  html_document:
+    code_folding: hide
 ---
 
 # I. Introduction & Motivation
@@ -175,7 +175,7 @@ multipleRingBuffer <- function(inputPolygon, maxDistance, interval)
 palette5 <- c("#CCCCFF","#CC99FF","#9966CC","#663399","#330066")
 
 ```
-### Load Census API key
+### 4. Load Census API key
 ```{r Other setup}
 knitr::opts_chunk$set(
 	echo = TRUE,
@@ -191,8 +191,8 @@ census_api_key("a7edab3d7c3df571998caab5a3cc12a4ec8d8b61" , overwrite  = TRUE)
 ## 1. Data Wrangling
 ### 1.1 Fetch Census Data
 ```{r Census Data, message=FALSE, warning=FALSE}
-# View(load_variables(2009,'acs5',cache = TRUE))
 
+# ---- 2009 Census Data -----
 tracts09 <-  
   get_acs(geography = "tract", variables = c("B25026_001E","B02001_002E","B15001_050E",
                                              "B15001_009E","B19013_001E","B25058_001E",
@@ -200,8 +200,7 @@ tracts09 <-
           year=2009, state= 48, county= 113, geometry=T) %>% 
   st_transform('EPSG:32138')
 
-# Let's "spread" the data into wide form
-# each row is tract, each column is variable
+
 tracts09 <- 
   tracts09 %>%
   dplyr::select( -NAME, -moe) %>%
@@ -215,27 +214,16 @@ tracts09 <-
          MedRent = B25058_001,
          TotalPoverty = B06012_002)
 
-# st_drop_geometry drops the geometry of its argument, and reclasses it accordingly
-st_drop_geometry(tracts09)[1:3,]
-
-# Let's create new rate variables using mutate
 
 tracts09 <- 
   tracts09 %>%
   mutate(pctWhite = ifelse(TotalPop > 0, Whites / TotalPop, 0),
-         pctBachelors = ifelse(TotalPop > 0, ((FemaleBachelors + MaleBachelors) / TotalPop), 0),
+         pctBachelors = ifelse(TotalPop > 0, ((FemaleBachelors + MaleBachelors) / TotalPop * 100), 0),
          pctPoverty = ifelse(TotalPop > 0, TotalPoverty / TotalPop, 0),
          year = "2009") %>%
   dplyr::select(-Whites,-FemaleBachelors,-MaleBachelors,-TotalPoverty)
 
-
-# Tracts 2009 is now complete. Let's grab 2017 tracts and do a congruent
-# set of operations
-
 # ---- 2017 Census Data -----
-
-# Notice that we are getting "wide" data here in the first place
-# This saves us the trouble of using "spread"
 
 tracts17 <- 
   get_acs(geography = "tract", variables = c("B25026_001E","B02001_002E","B15001_050E",
@@ -252,7 +240,7 @@ tracts17 <-
          TotalPoverty = B06012_002E) %>%
   dplyr::select(-NAME, -starts_with("B")) %>% #-starts_with("B") awesome!
   mutate(pctWhite = ifelse(TotalPop > 0, Whites / TotalPop,0),
-         pctBachelors = ifelse(TotalPop > 0, ((FemaleBachelors + MaleBachelors) / TotalPop),0),
+         pctBachelors = ifelse(TotalPop > 0, ((FemaleBachelors + MaleBachelors) / TotalPop * 100),0),
          pctPoverty = ifelse(TotalPop > 0, TotalPoverty / TotalPop, 0),
          year = "2017") %>%
   dplyr::select(-Whites, -FemaleBachelors, -MaleBachelors, -TotalPoverty) 
@@ -315,8 +303,8 @@ selectCentroids <-
 
 head(selectCentroids,5)
 ```
-## 2. TOD vs. Non-TOD: Four Variables
-### 2.1 Census Data in Group by TODs
+
+### 1.4 Census Data in Group by TODs
 ```{r Tracts in group, echo=TRUE}
 allTracts.group <- 
   rbind(
@@ -334,20 +322,21 @@ allTracts.group <-
 
 ```
 
-### 2.2 TOD and Non-TOD in 2009 and 2017
-
+### 1.5 TOD and Non-TOD between 2009 and 2017
 ```{r TOD vs. Non-TOD, echo=TRUE, message=FALSE, warning=FALSE}
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09))+
   geom_sf(aes(fill = TOD)) +
   labs(title = "Time/Space Groups",
        subtitle = '',
-       caption = 'Figure 2.1') +
+       caption = 'Figure 1') +
   facet_wrap(~year)+
   mapTheme() + 
   theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 ```
-### 2.3 Median Rent Comparison between 2009 and 2017 
+
+## 2. TOD vs. Non-TOD: Four Variables
+### 2.1 Median Rent Comparison between 2009 and 2017 
 ```{r Median Rent, echo=TRUE, message=FALSE, warning=FALSE}
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09))+
@@ -357,121 +346,62 @@ ggplot(allTracts.group)+
                     name = "Rent\n(Quintile Breaks)") +
   labs(title = "Median Rent (w/inflation) 2009-2017", 
        subtitle = "Real dollars \n",
-       caption = 'Figure 2.2.1') +
-  facet_wrap(~year)+
+       caption = 'Figure 2.1') +
+  facet_wrap(c(~year, ~TOD))+
   mapTheme() + 
-  theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
-
-ggplot(allTracts.group)+
-  geom_sf(data = st_union(tracts09))+
-  geom_sf(aes(fill = q5(MedRent.inf))) +
-  geom_sf(data = buffer, fill = "transparent", color = "orange" ) +
-  scale_fill_manual(values = palette5,
-                    labels = qBr(allTracts.group, "MedRent.inf"),
-                    name = "Rent\n(Quintile Breaks)") +
-  labs(title = "Median Rent (w/inflation) 2009-2017 ", 
-       subtitle = "Real dollars; The orange border denotes areas close to transit stations \n",
-       caption = 'Figure 2.2.2') +
-  facet_wrap(~year) +
-  mapTheme() + 
-  theme(plot.title = element_text(size=15)) +
   theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 ```
-### 2.4. Percentage of White Group between 2009 and 2017 
+
+
+### 2.2 Percentage of White Group between 2009 and 2017 
 ```{r Percentage of White Group, echo=TRUE, message=FALSE, warning=FALSE}
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09)) +
   geom_sf(aes(fill = q5(pctWhite))) +
   scale_fill_manual(values = palette5,
                     labels = qBr(allTracts.group, "pctWhite"),
-                    name = "Rent\n(Quintile Breaks)") +
+                    name = "Percentage of White Group\n(Quintile Breaks)") +
   labs(title = "Percentage of White Group 2009-2017",
        subtitle = '',
-       caption = 'Figure 2.3.1') +
-  facet_wrap(~year)+
+       caption = 'Figure 2.2') +
+  facet_wrap(c(~year,~TOD))+
   mapTheme() + 
   theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
-
-
-ggplot(allTracts.group)+
-  geom_sf(data = st_union(tracts09)) +
-  geom_sf(aes(fill = q5(pctWhite))) +
-  geom_sf(data = buffer, fill = "transparent", color = "red") +
-  scale_fill_manual(values = palette5,
-                    labels = qBr(allTracts.group, "pctWhite"),
-                    name = "Rent\n(Quintile Breaks)") +
-  labs(title = "Percentage of White Group 2009-2017" ,
-       subtitle = '',
-       caption = 'Figure 2.3.2') +
-  facet_wrap(~year)+
-  mapTheme() + 
-  theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
-
-
 ```
-### 2.5. Bachelor Degree Comparison between 2009 and 2017
+
+
+### 2.3 Bachelor Degree Comparison between 2009 and 2017
 ```{r Bachelor Degree, echo=TRUE, message=FALSE, warning=FALSE}
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09))+
   geom_sf(aes(fill = q5(pctBachelors))) +
   scale_fill_manual(values = palette5,
                     labels = qBr(allTracts.group, "pctBachelors"),
-                    name = "Rent\n(Quintile Breaks)") +
+                    name = "Percentage of Bachelar Degree (%)\n(Quintile Breaks)") +
   labs(title = "Bachelor Degree Comparison between 2009-2017",
        subtitle = '',
-       caption = 'Figure 2.4.1') +
-  facet_wrap(~year)+
+       caption = 'Figure 2.3') +
+  facet_wrap(c(~year,~TOD))+
   mapTheme() + 
   theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
-
-ggplot(allTracts.group)+
-  geom_sf(data = st_union(tracts09))+
-  geom_sf(aes(fill = q5(pctBachelors))) +
-  geom_sf(data = buffer, fill = "transparent", color = "orange")+
-  scale_fill_manual(values = palette5,
-                    labels = qBr(allTracts.group, "pctBachelors"),
-                    name = "Rent\n(Quintile Breaks)") +
-  labs(title = "Bachelor Degree Comparison by TODs (2009-2017)",
-       subtitle = '',
-       caption = 'Figure 2.4.2') +
-  facet_wrap(~year)+
-  mapTheme() + 
-  theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
-
-
 ```
 
 
-### 2.6. Median Household Income Comparison between 2009 and 2017
+
+### 2.4 Median Household Income Comparison between 2009 and 2017
 ```{r Median Household Income, echo=TRUE, message=FALSE, warning=FALSE}
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09))+
   geom_sf(aes(fill = q5(MedHHInc))) +
   scale_fill_manual(values = palette5,
                     labels = qBr(allTracts.group, "MedHHInc"),
-                    name = "Rent\n(Quintile Breaks)") +
+                    name = "Median Household Income\n(Quintile Breaks)") +
   labs(title = "Median Household Income 2009-2017",
        subtitle = 'Real dollars \n',
-       caption = 'Figure 2.5.1') +
-  facet_wrap(~year)+
+       caption = 'Figure 2.4') +
+  facet_wrap(c(~year,~TOD))+
   mapTheme() + 
   theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
-
-
-ggplot(allTracts.group)+
-  geom_sf(data = st_union(tracts09))+
-  geom_sf(aes(fill = q5(MedHHInc))) +
-  geom_sf(data = buffer, fill = "transparent", color = "orange")+
-  scale_fill_manual(values = palette5,
-                    labels = qBr(allTracts.group, "MedHHInc"),
-                    name = "Rent\n(Quintile Breaks)") +
-  labs(title = "Median Household Income by TODs (2009-2017)", 
-       subtitle = "Real dollars; The orange border denotes areas close to transit stations \n",
-       caption = 'Figure 2.5.2') +
-  facet_wrap(~year)+
-  mapTheme() + 
-  theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
-
 ```
 
 ## 3. Grouped Bar Plot
@@ -517,7 +447,7 @@ allTracts.Summary %>%
 
 
 
-## 5. Graduated Symbol Maps of Population and Rent within 0.5 mile of each transit station
+## 5. Graduated Symbol Maps
 
 ```{r selected stop, message=FALSE, warning=FALSE, include=FALSE}
 selected_stops <- 
@@ -532,7 +462,7 @@ join_data <-
 
 ```
 
-### 5.1. Graduated symbol map of population within 0.5 mile of each transit station
+### 5.1 Population within 0.5 mile of each transit station
 ```{r Graduated symbol map of population, echo=TRUE, message=FALSE, warning=FALSE}
 popByStation <-
   join_data %>% 
@@ -548,8 +478,8 @@ popByStation_sf <- popByStation %>%
 Dallas <- st_read('https://www.dallasopendata.com/api/geospatial/mn9w-m2tp?method=export&format=GeoJSON')
 
 ggplot() + 
-  geom_sf(data = Dallas, fill = 'grey') +
-  geom_sf(data = popByStation_sf, aes(size = `Total Population`), color = 'blue') +
+  geom_sf(data = Dallas, fill = 'lightgrey') +
+  geom_sf(data = popByStation_sf, aes(size = `Total Population`), color = '#5e9bb2') +
   labs(title = "Graduated Symbol Map: \nPopulation within 0.5 Mile of Each Transit Station" ,
        subtitle = '',
        caption = "Figure 5.1", 
@@ -562,7 +492,7 @@ ggplot() +
 
 
 
-### 5.2. Graduated symbol maps of median rent within 0.5 mile of each transit station.
+### 5.2 Median rent within 0.5 mile of each transit station
 ```{r Graduated symbol maps of median rent, echo=TRUE, message=FALSE, warning=FALSE}
 rentByStation <-
   join_data %>%
@@ -576,8 +506,8 @@ rentByStation_sf <- rentByStation %>%
   st_sf()
 
 ggplot() + 
-  geom_sf(data = Dallas, fill = 'grey') +
-  geom_sf(data = rentByStation_sf, aes(size = `Median Rent`), color = 'purple')  +  
+  geom_sf(data = Dallas, fill = 'lightgrey') +
+  geom_sf(data = rentByStation_sf, aes(size = `Median Rent`), color = '#c2a7ef')  +  
   labs(title = "Graduated Symbol Map: \nMedian Rent within 0.5 Mile of Each Transit Station",
        subtitle = '',
        caption = "Figure 5.2") +
@@ -623,7 +553,7 @@ ggplot(data = mean_RENT) +
 
 
 
-## 7. Crime, Transit Access and Rents
+## 7. Crime Rate, Transit Access and Rents
 ```{r Crime Data, echo=FALSE, message=FALSE, warning=FALSE}
 # 1. Load Crime-Burglary Data
 crime_dat <- read.csv('Dallas_Crime_Data.CSV')

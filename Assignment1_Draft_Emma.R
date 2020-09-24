@@ -413,25 +413,11 @@ ggplot(allTracts.group)+
                     name = "Rent\n(Quintile Breaks)") +
   labs(title = "Median Rent (w/inflation) 2009-2017", 
        subtitle = "Real dollars \n",
-       caption = 'Figure 2.2.1') +
-  facet_wrap(~year)+
+       caption = 'Figure 2.2') +
+  facet_wrap(c(~year, ~TOD))+
   mapTheme() + 
   theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 
-ggplot(allTracts.group)+
-  geom_sf(data = st_union(tracts09))+
-  geom_sf(aes(fill = q5(MedRent.inf))) +
-  geom_sf(data = buffer, fill = "transparent", color = "orange" ) +
-  scale_fill_manual(values = palette5,
-                    labels = qBr(allTracts.group, "MedRent.inf"),
-                    name = "Rent\n(Quintile Breaks)") +
-  labs(title = "Median Rent with 2009-2017 ", 
-       subtitle = "Real dollars; The orange border denotes areas close to transit stations \n",
-       caption = 'Figure 2.2.2') +
-  facet_wrap(~year) +
-  mapTheme() + 
-  theme(plot.title = element_text(size=15)) +
-  theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 
 
 # 3. Percentage of White Group between 2009 and 2017 
