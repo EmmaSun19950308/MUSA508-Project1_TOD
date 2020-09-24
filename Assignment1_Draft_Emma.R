@@ -363,7 +363,7 @@ selectCentroids <-
   mutate(Selection_Type = "Select by Centroids")
 
 
-
+# Q2
 # ---- Indicator Maps ----
 
 # We do our centroid joins as above, and then do a "disjoin" to get the ones that *don't*
@@ -386,7 +386,7 @@ allTracts.group <-
       mutate(TOD = "Non-TOD")) %>%
   mutate(MedRent.inf = ifelse(year == "2009", MedRent * 1.14, MedRent))  # inflation
 
-
+# 1. TOD and Non-TOD in 2009 and 2017
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09))+
   geom_sf(aes(fill = TOD)) +
@@ -395,28 +395,68 @@ ggplot(allTracts.group)+
   mapTheme() + 
   theme(plot.title = element_text(size=22))
 
+# 2. Median Rent Comparison between 2009 and 2017 
+ggplot(allTracts.group)+
+  geom_sf(data = st_union(tracts09))+
+  geom_sf(aes(fill = q5(MedRent.inf))) +
+  scale_fill_manual(values = palette5,
+                    labels = qBr(allTracts.group, "MedRent.inf"),
+                    name = "Rent\n(Quintile Breaks)") +
+  labs(title = "Median Rent (w/inflation) 2009-2017", subtitle = "Real Dollars") +
+  facet_wrap(~year)+
+  mapTheme() + 
+  theme(plot.title = element_text(size=22))
 
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09))+
   geom_sf(aes(fill = q5(MedRent.inf))) +
-  geom_sf(data = buffer, fill = "transparent", color = "red" )+
+  geom_sf(data = buffer, fill = "transparent", color = "orange" ) +
   scale_fill_manual(values = palette5,
                     labels = qBr(allTracts.group, "MedRent.inf"),
                     name = "Rent\n(Quintile Breaks)") +
-  labs(title = "Median Rent 2009-2017", subtitle = "Real Dollars") +
+  labs(title = "Median Rent wih 2009-2017 ", 
+       subtitle = "Real Dollars; The orange border denotes areas close to trasit stations") +
+  facet_wrap(~year) +
+  mapTheme() + 
+  theme(plot.title = element_text(size=22))
+
+
+# 3. Percentage of White Group between 2009 and 2017 
+ggplot(allTracts.group)+
+  geom_sf(data = st_union(tracts09)) +
+  geom_sf(aes(fill = q5(pctWhite))) +
+  scale_fill_manual(values = palette5,
+                    labels = qBr(allTracts.group, "pctWhite"),
+                    name = "Rent\n(Quintile Breaks)") +
+  labs(title = "Percentage of White Group 2009-2017") +
   facet_wrap(~year)+
   mapTheme() + 
   theme(plot.title = element_text(size=22))
 
 
 ggplot(allTracts.group)+
-  geom_sf(data = st_union(tracts09))+
+  geom_sf(data = st_union(tracts09)) +
   geom_sf(aes(fill = q5(pctWhite))) +
-  geom_sf(data = buffer, fill = "transparent", color = "red")+
+  geom_sf(data = buffer, fill = "transparent", color = "red") +
   scale_fill_manual(values = palette5,
                     labels = qBr(allTracts.group, "pctWhite"),
                     name = "Rent\n(Quintile Breaks)") +
-  labs(title = "Median Rent 2009-2017", subtitle = "Real Dollars") +
+  labs(title = "Percentage of White Group 2009-2017" ,
+       subtitle = "Real Dollars; The orange border denotes areas close to trasit stations") +
+  facet_wrap(~year)+
+  mapTheme() + 
+  theme(plot.title = element_text(size=22))
+
+
+# 4. Bachelor Degree Comparison between 2009 and 2017
+ggplot(allTracts.group)+
+  geom_sf(data = st_union(tracts09))+
+  geom_sf(aes(fill = q5(pctBachelors))) +
+  geom_sf(data = buffer, fill = "transparent", color = "orange")+
+  scale_fill_manual(values = palette5,
+                    labels = qBr(allTracts.group, "pctBachelors"),
+                    name = "Rent\n(Quintile Breaks)") +
+  labs(title = "Bachelor Degree Comparison by TODs 2009-2017") +
   facet_wrap(~year)+
   mapTheme() + 
   theme(plot.title = element_text(size=22))
@@ -425,11 +465,26 @@ ggplot(allTracts.group)+
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09))+
   geom_sf(aes(fill = q5(pctBachelors))) +
-  geom_sf(data = buffer, fill = "transparent", color = "red")+
+  geom_sf(data = buffer, fill = "transparent", color = "orange")+
   scale_fill_manual(values = palette5,
                     labels = qBr(allTracts.group, "pctBachelors"),
                     name = "Rent\n(Quintile Breaks)") +
-  labs(title = "Median Rent 2009-2017", subtitle = "Real Dollars") +
+  labs(title = "Bachelor Degree Comparison by TODs 2009-2017", 
+       subtitle = "The orange border denotes areas close to transit stations") +
+  facet_wrap(~year)+
+  mapTheme() + 
+  theme(plot.title = element_text(size=22))
+
+
+# 5. Median Household Income Comparison between 2009 and 2017
+ggplot(allTracts.group)+
+  geom_sf(data = st_union(tracts09))+
+  geom_sf(aes(fill = q5(MedHHInc))) +
+  geom_sf(data = buffer, fill = "transparent", color = "orange")+
+  scale_fill_manual(values = palette5,
+                    labels = qBr(allTracts.group, "MedHHInc"),
+                    name = "Rent\n(Quintile Breaks)") +
+  labs(title = "Median Household Income 2009-2017") +
   facet_wrap(~year)+
   mapTheme() + 
   theme(plot.title = element_text(size=22))
@@ -438,14 +493,16 @@ ggplot(allTracts.group)+
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09))+
   geom_sf(aes(fill = q5(MedHHInc))) +
-  geom_sf(data = buffer, fill = "transparent", color = "red")+
+  geom_sf(data = buffer, fill = "transparent", color = "orange")+
   scale_fill_manual(values = palette5,
                     labels = qBr(allTracts.group, "MedHHInc"),
                     name = "Rent\n(Quintile Breaks)") +
-  labs(title = "Median Rent 2009-2017", subtitle = "Real Dollars") +
+  labs(title = "Median Household Income by TODs 2009-2017", 
+       subtitle = "Real Dollars; The orange border denotes areas close to trasit stations") +
   facet_wrap(~year)+
   mapTheme() + 
   theme(plot.title = element_text(size=22))
+
 
 # --- TOD Indicator Tables ----
 
