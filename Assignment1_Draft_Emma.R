@@ -301,23 +301,31 @@ allTracts <- rbind(tracts09,tracts17)
 
 # ---- Wrangling Transit Open Data -----
 
+# Load Dallas Boundary Data
+Dallas <- st_read('https://www.dallasopendata.com/api/geospatial/mn9w-m2tp?method=export&format=GeoJSON')
+
+# Load Dallas Transit Stops Data
 D_Stops <- 
   st_read('https://opendata.arcgis.com/datasets/65b609c50cba44c19cfbaa2a0251a8ae_0.geojson') %>% 
       mutate(Line = "Dallas Transit") %>%
       select(STA_NAME) %>%
   st_transform(st_crs(tracts09))  
 
-
+# Plot Dallas Transits
 ggplot() + 
-  geom_sf(data=st_union(tracts09)) +
+  geom_sf(data= Dallas) +
   geom_sf(data=D_Stops, 
-          aes(colour = 'orange'), 
+          aes(color = 'orange'), 
           show.legend = "point", size= 2) +
-  scale_colour_manual(values = c("orange")) +
+  scale_colour_manual(values = c("orange"),
+                      labels = 'Stations',
+                      name = ' ') +
   labs(title="Dallas Transit Stops", 
        subtitle=" ", 
-       caption="Figure 1.1") +
-  mapTheme()
+       caption="Figure 1.1") + 
+  plotTheme() +
+  theme(plot.title = element_text(color = "darkred", size=15, face="bold"))
+  
 
 # --- Relating Dallas Stops and Tracts ----
 
@@ -362,7 +370,6 @@ selectCentroids <-
   dplyr::select(TotalPop) %>%
   mutate(Selection_Type = "Select by Centroids")
 
-
 # Q2
 # ---- Indicator Maps ----
 
@@ -390,10 +397,12 @@ allTracts.group <-
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09))+
   geom_sf(aes(fill = TOD)) +
-  labs(title = "Time/Space Groups") +
+  labs(title = "Time/Space Groups",
+       subtitle = '',
+       caption = 'Figure 2.1') +
   facet_wrap(~year)+
   mapTheme() + 
-  theme(plot.title = element_text(size=22))
+  theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 
 # 2. Median Rent Comparison between 2009 and 2017 
 ggplot(allTracts.group)+
@@ -402,10 +411,12 @@ ggplot(allTracts.group)+
   scale_fill_manual(values = palette5,
                     labels = qBr(allTracts.group, "MedRent.inf"),
                     name = "Rent\n(Quintile Breaks)") +
-  labs(title = "Median Rent (w/inflation) 2009-2017", subtitle = "Real Dollars") +
+  labs(title = "Median Rent (w/inflation) 2009-2017", 
+       subtitle = "Real dollars \n",
+       caption = 'Figure 2.2.1') +
   facet_wrap(~year)+
   mapTheme() + 
-  theme(plot.title = element_text(size=22))
+  theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09))+
@@ -414,11 +425,13 @@ ggplot(allTracts.group)+
   scale_fill_manual(values = palette5,
                     labels = qBr(allTracts.group, "MedRent.inf"),
                     name = "Rent\n(Quintile Breaks)") +
-  labs(title = "Median Rent wih 2009-2017 ", 
-       subtitle = "Real Dollars; The orange border denotes areas close to trasit stations") +
+  labs(title = "Median Rent with 2009-2017 ", 
+       subtitle = "Real dollars; The orange border denotes areas close to transit stations \n",
+       caption = 'Figure 2.2.2') +
   facet_wrap(~year) +
   mapTheme() + 
-  theme(plot.title = element_text(size=22))
+  theme(plot.title = element_text(size=15)) +
+  theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 
 
 # 3. Percentage of White Group between 2009 and 2017 
@@ -428,10 +441,12 @@ ggplot(allTracts.group)+
   scale_fill_manual(values = palette5,
                     labels = qBr(allTracts.group, "pctWhite"),
                     name = "Rent\n(Quintile Breaks)") +
-  labs(title = "Percentage of White Group 2009-2017") +
+  labs(title = "Percentage of White Group 2009-2017",
+       subtitle = '',
+       caption = 'Figure 2.3.1') +
   facet_wrap(~year)+
   mapTheme() + 
-  theme(plot.title = element_text(size=22))
+  theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 
 
 ggplot(allTracts.group)+
@@ -442,25 +457,26 @@ ggplot(allTracts.group)+
                     labels = qBr(allTracts.group, "pctWhite"),
                     name = "Rent\n(Quintile Breaks)") +
   labs(title = "Percentage of White Group 2009-2017" ,
-       subtitle = "Real Dollars; The orange border denotes areas close to trasit stations") +
+       subtitle = '',
+       caption = 'Figure 2.3.2') +
   facet_wrap(~year)+
   mapTheme() + 
-  theme(plot.title = element_text(size=22))
+  theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 
 
 # 4. Bachelor Degree Comparison between 2009 and 2017
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09))+
   geom_sf(aes(fill = q5(pctBachelors))) +
-  geom_sf(data = buffer, fill = "transparent", color = "orange")+
   scale_fill_manual(values = palette5,
                     labels = qBr(allTracts.group, "pctBachelors"),
                     name = "Rent\n(Quintile Breaks)") +
-  labs(title = "Bachelor Degree Comparison by TODs 2009-2017") +
+  labs(title = "Bachelor Degree Comparison between 2009-2017",
+       subtitle = '',
+       caption = 'Figure 2.5.1') +
   facet_wrap(~year)+
   mapTheme() + 
-  theme(plot.title = element_text(size=22))
-
+  theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09))+
@@ -469,25 +485,26 @@ ggplot(allTracts.group)+
   scale_fill_manual(values = palette5,
                     labels = qBr(allTracts.group, "pctBachelors"),
                     name = "Rent\n(Quintile Breaks)") +
-  labs(title = "Bachelor Degree Comparison by TODs 2009-2017", 
-       subtitle = "The orange border denotes areas close to transit stations") +
+  labs(title = "Bachelor Degree Comparison by TODs (2009-2017)",
+       subtitle = '',
+       caption = 'Figure 2.5.2') +
   facet_wrap(~year)+
   mapTheme() + 
-  theme(plot.title = element_text(size=22))
-
+  theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 
 # 5. Median Household Income Comparison between 2009 and 2017
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09))+
   geom_sf(aes(fill = q5(MedHHInc))) +
-  geom_sf(data = buffer, fill = "transparent", color = "orange")+
   scale_fill_manual(values = palette5,
                     labels = qBr(allTracts.group, "MedHHInc"),
                     name = "Rent\n(Quintile Breaks)") +
-  labs(title = "Median Household Income 2009-2017") +
+  labs(title = "Median Household Income 2009-2017",
+       subtitle = 'Real dollars',
+       caption = 'Figure 2.5.1') +
   facet_wrap(~year)+
   mapTheme() + 
-  theme(plot.title = element_text(size=22))
+  theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 
 
 ggplot(allTracts.group)+
@@ -497,24 +514,44 @@ ggplot(allTracts.group)+
   scale_fill_manual(values = palette5,
                     labels = qBr(allTracts.group, "MedHHInc"),
                     name = "Rent\n(Quintile Breaks)") +
-  labs(title = "Median Household Income by TODs 2009-2017", 
-       subtitle = "Real Dollars; The orange border denotes areas close to trasit stations") +
+  labs(title = "Median Household Income 2009-2017",
+       subtitle = 'Real dollars',
+       caption = 'Figure 2.5.1') +
   facet_wrap(~year)+
   mapTheme() + 
-  theme(plot.title = element_text(size=22))
+  theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 
 
-# --- TOD Indicator Tables ----
+# --- TOD Indicator Plots ------
+
+# Let's create small multiple plots
+# We use the "gather" command (look this one up please)
+# To go from wide to long
+# Why do we do this??
+# Notice we can "pipe" a ggplot call right into this operation!
 
 allTracts.Summary <- 
   st_drop_geometry(allTracts.group) %>%
   group_by(year, TOD) %>%
   summarize(Rent = mean(MedRent, na.rm = T),
             Population = mean(TotalPop, na.rm = T),
-            Percent_White = mean(pctWhite, na.rm = T),
-            Percent_Bach = mean(pctBachelors, na.rm = T),
+            `White Proprotion` = mean(pctWhite, na.rm = T),
+            `Bachelor Degree Proportion` = mean(pctBachelors, na.rm = T),
             Percent_Poverty = mean(pctPoverty, na.rm = T),
-            Median_Household_Income = mean(MedHHInc, na.rm = T))
+            `Median Household Income` = mean(MedHHInc, na.rm = T))
+
+allTracts.Summary %>%
+  gather(Variable, Value, -year, -TOD) %>%
+  ggplot(aes(year, Value, fill = TOD)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~Variable, scales = "free", ncol=3) +
+  scale_fill_manual(values = c("#debae4", "#800694")) +
+  labs(title = "Indicator differences across time and space") +
+  plotTheme() + 
+  theme(legend.position="bottom")
+
+
+# --- TOD Indicator Tables ----
 
 allTracts.Summary %>%
   unite(year.TOD, year, TOD, sep = ": ", remove = T) %>%
@@ -526,46 +563,65 @@ allTracts.Summary %>%
   footnote(general_title = "\n",
            general = "Table 2.3")
 
-# --- TOD Indicator Plots ------
-
-# Let's create small multiple plots
-# We use the "gather" command (look this one up please)
-# To go from wide to long
-# Why do we do this??
-# Notice we can "pipe" a ggplot call right into this operation!
-
-allTracts.Summary %>%
-  gather(Variable, Value, -year, -TOD) %>%
-  ggplot(aes(year, Value, fill = TOD)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  facet_wrap(~Variable, scales = "free", ncol=5) +
-  scale_fill_manual(values = c("#debae4", "#800694")) +
-  labs(title = "Indicator differences across time and space") +
-  plotTheme() + 
-  theme(legend.position="bottom")
 
 # Q5
-
-new_buffer <- 
+selected_stops <- 
   st_transform(D_Stops,('EPSG:32138')) %>%
   st_union(st_buffer(D_Stops, 2640)) %>%
   st_sf() %>%
   dplyr::select(STA_NAME)
 
+# 1. Graduated symbol map of population within 0.5 mile of each transit station
 join_data <- 
-  st_join(tracts17, new_buffer) %>%
-  filter(!is.na(STA_NAME))
+  st_join(tracts17, selected_stops) %>%
+  filter(!is.na(STA_NAME)) 
 
 popByStation <-
   join_data %>% 
   group_by(STA_NAME) %>%
-  summarize(sumPop = sum(TotalPop)) 
-  
+  summarize(`Total Population` = sum(TotalPop)) %>%
+  dplyr::select(STA_NAME, `Total Population`) %>%
+  st_drop_geometry() %>%
+  left_join(D_Stops)
+
+popByStation_sf <- popByStation %>%
+  st_sf()
+
 Dallas <- st_read('https://www.dallasopendata.com/api/geospatial/mn9w-m2tp?method=export&format=GeoJSON')
 
 ggplot() + 
   geom_sf(data = Dallas, fill = 'grey') +
-  geom_sf(data = popByStation, aes(size = sumPop)) 
+  geom_sf(data = popByStation_sf, aes(size = `Total Population`), color = 'blue') +
+  labs(title = "Graduated Symbol Map: \nPopulation within 0.5 Mile of Each Transit Station" ,
+       subtitle = '',
+       caption = "Figure 5.1", 
+       fill = 'Total Population') +
+  plotTheme() + 
+  theme(legend.position="right") + 
+  theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
+
+
+# 2. Graduated symbol maps of median rent within 0.5 mile of each transit station.
+rentByStation <-
+  join_data %>%
+  group_by(STA_NAME) %>%
+  summarize(`Median Rent` = median(na.omit(MedRent))) %>%
+  dplyr::select(STA_NAME, `Median Rent`)  %>% 
+  st_drop_geometry() %>%
+  left_join(D_Stops)
+
+rentByStation_sf <- rentByStation %>%
+  st_sf()
+
+ggplot() + 
+  geom_sf(data = Dallas, fill = 'grey') +
+  geom_sf(data = rentByStation_sf, aes(size = `Median Rent`), color = 'purple')  +  
+  labs(title = "Graduated Symbol Map: \nMedian Rent within 0.5 Mile of Each Transit Station",
+       subtitle = '',
+       caption = "Figure 5.2") +
+  plotTheme() + 
+  theme(legend.position="right") + 
+  theme(plot.title = element_text(color = "darkred", size=15, face="bold"))
 
 
 
@@ -586,10 +642,18 @@ mean_RENT <- allTracts.rings %>%
   summarize(mean_RENT = mean(MedRent)) 
 
 ggplot(data = mean_RENT) +
-  geom_line(aes(x = distance, y = mean_RENT, col = year)) +
-  labs(title = " Rent as a function of distance to subway stations (Figure x.x.x)") +
-  plotTheme() + 
-  theme(legend.position="bottom")
+  geom_line(aes(x = distance, y = mean_RENT, col = year), size = 2) + 
+  geom_point(aes(x = distance, y = mean_RENT, col = year)) + 
+  labs(title = " Rent as a function of distance to subway stations",
+       subtitle = '',
+       caption = 'Figure 6.1') +
+  scale_color_manual(values = c('darkblue','green'),
+                     name = 'Year') +
+  theme(legend.position = "right") +
+  xlab("Distance to Stations, Miles") + 
+  ylab("Average Rents") +
+  theme_classic() +
+  theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 
 
 # Q7
@@ -627,7 +691,7 @@ ggplot(allTracts.group)+
   plotTheme() + 
   theme(legend.position="bottom")
   mapTheme() + 
-  theme(plot.title = element_text(size=22))
+  theme(plot.title = element_text(color = "darkred", size=15, face="bold")) +
 
 
 
