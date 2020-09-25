@@ -9,14 +9,17 @@ output:
 
 ## I. Introduction & Motivation
 
+Transit-Oriented Development, or TOD for short, is at the heart of the City of Dallas' long-range land use plan, [*forward*Dallas!]( https://dallascityhall.com/departments/pnv/strategic-planning/Pages/forward-dallas.aspx). Dallas is home to 74 passenger rail stations in the system of [Dallas Area Rapid Transit (DART)](https://en.wikipedia.org/wiki/Dallas_Area_Rapid_Transit), and each presenting a unique opportunity to develop a new mixed-use neighborhood. DART is a transit agency serving the Dallas–Fort Worth metroplex of Texas. It operates buses, light rail, commuter rail, and high-occupancy vehicle lanes in Dallas and twelve of its suburbs. DART reported the [92,000]( https://web.archive.org/web/20200523094728/https://www.apta.com/wp-content/uploads/2019-Q4-Ridership-APTA.pdf) average weekday riders in 4th quarter of 2019. In terms of the commute situation of residents in Dallas, [3.8%](https://assets.dmagstatic.com/wp-content/uploads/2020/04/Presentation-1.pdf) of Dallas residents commute via public transit while [50,000](https://assets.dmagstatic.com/wp-content/uploads/2020/04/Presentation-1.pdf) Dallas residents commute over an hour each way to/from work. 
+
+When DART originally proposed the system back in the 1980s, the hope was that new rail stations would spur on new developments of dense housing and commercial real estate. And so far, a new [study]( https://www.dart.org/about/economicimpact.asp) has just shown how productive and important DART is to the overall North Texas economy, generating billions of dollars in revenue, taxes and jobs.
+
+Accordingly, this project is aimed at provide an overview on whether residents would like to pay more for the sake of the potential benefits from TOD in Dallas.
 
 
 
 ## II. Setup
-我把这个部分的标题都删掉了，因为这些setup没必要展示在final deliverable里面。
 
-
-In this section, we loaded necessary libraries, created plot theme options and map theme options, and identified functions for quintile breaks.
+In this section, we loaded necessary libraries, created plot theme options and map theme options, and identified functions of quintile breaks for further analysis.
 
 ```{r Load Libraries, echo=TRUE, message=FALSE, warning=FALSE}
 # 1. load Libraries
@@ -178,12 +181,27 @@ census_api_key("a7edab3d7c3df571998caab5a3cc12a4ec8d8b61" , overwrite  = TRUE)
 
 ## III. Data Manipulation and Visualization
 ### 1. Data Wrangling
-这里介绍dataset
+Three datasets were used in this project:
 
+* **Census Data**: demographic variables from the ACS 2009 and 2017 for census tracts in Dallas County.
+
+* **DART Railway Station Data**: Dallas transit data in geojson format from the DART transit system
+
+* **Crime Data**: Case-level burglary crime data between Jan 2017 to Dec 2017
 
 #### 1.1 Fetch Census Data
 
-这里介绍选择什么year census data 以及什么变量
+Variables we were interested in this projects are:
+
+* Total population 
+
+* White population percentage
+
+* Percentage of adults who are Bachelor Degree holders
+
+* Median household income (adjusted for inflation)
+
+* Median rent (adjusted for inflation)
 
 ```{r Census Data, message=FALSE, warning=FALSE, results = FALSE}
 
@@ -247,6 +265,8 @@ allTracts <- rbind(tracts09,tracts17)
 
 
 #### 1.2 Load Dallas Transit Data 
+Showed in Figure 1.1, DART has **74** stations, spreading from Downtown to multiple directions updated to 2017.
+
 ```{r Transit Data, message=FALSE, warning=FALSE, include=FALSE}
 # Load Dallas Boundary Data
 Dallas <- st_read('https://www.dallasopendata.com/api/geospatial/mn9w-m2tp?method=export&format=GeoJSON')
@@ -277,6 +297,10 @@ ggplot() +
 ```
 
 #### 1.3 Identifying TOD Tracts
+With census data and transit data ready, let's jump into TOD analysis! Similarly to the textbook, we created a 0.5 mile buffer around the transit stops and selected centroidized tracts if the center of a census tract was located within this buffer zone. In this way, we selected TOD tracts.
+
+Indicated in Figure 1.2, despite slight decrease in the northeast Dallas, TOD tracts did not change much in the past 10 years.
+
 ```{r Create buffers and select tracts, echo=TRUE, message=FALSE, warning=FALSE, results = FALSE}
 D_Buffers <- 
   rbind(
@@ -319,14 +343,20 @@ ggplot(allTracts.group)+
   geom_sf(aes(fill = TOD)) +
   labs(title = "Time/Space Groups",
        subtitle = '',
-       caption = 'Figure 1') +
+       caption = 'Figure 1.2') +
   facet_wrap(~year)+
   mapTheme() + 
   theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 ```
 
-
 ### 2. Changes in Census Variables Over Time and Space
+
+In Section 2, we examined the effects of time (years) and space (TOD vs non-TOD) on our four key Census variables:
+
+* **Median rents** obviously increased from 2009 to 2017 but the increasing rate of TOD tracts was higher compared to non-TOD tracts. Similar trend could also be found in percentage of **Bachelor degree holders** and **median household income**. 
+
+* However, there was no obvious change on percentage of **white group** between two time across TOD or non-TOD tracts. 
+
 #### 2.1 Median Rent Comparison between 2009 and 2017 
 ```{r Median Rent, echo=TRUE, message=FALSE, warning=FALSE}
 ggplot(allTracts.group)+
@@ -342,7 +372,6 @@ ggplot(allTracts.group)+
   mapTheme() + 
   theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 ```
-
 
 #### 2.2 Percentage of White Group between 2009 and 2017 
 ```{r Percentage of White Group, echo=TRUE, message=FALSE, warning=FALSE}
@@ -360,7 +389,6 @@ ggplot(allTracts.group)+
   theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 ```
 
-
 #### 2.3 Bachelor Degree Comparison between 2009 and 2017
 ```{r Bachelor Degree, echo=TRUE, message=FALSE, warning=FALSE}
 ggplot(allTracts.group)+
@@ -376,8 +404,6 @@ ggplot(allTracts.group)+
   mapTheme() + 
   theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 ```
-
-
 
 #### 2.4 Median Household Income Comparison between 2009 and 2017
 ```{r Median Household Income, echo=TRUE, message=FALSE, warning=FALSE}
@@ -396,11 +422,13 @@ ggplot(allTracts.group)+
 ```
 
 ### 3. Bar Plot Comparisons
-We can examine these same variables over time using a barplot to more precisely compare the values within and outside of transit-oriented development tracts. Rent was and household income were adjusted for inflation.
+Grouped bar plots would provide a more precise and direct approach of examining the four variables over time. Some highlights are provided as follows:
 
-**Highlight: Percentage of people with a bachelor’s degree and % of white people increased in transit areas between 2009-2017 but stayed at similar levels outside of these areas.**
+* Percentage of people with a **Bachelor’s degree** significantly increased for TOD tracts but remained the same level for those non-TOD tracts.
+* **Median household income** of TOD tracts and non-TOD tracts both increased but interestingly, income of non-TOD tracts was higher than TOD-tracts all the way. Similar trend can also be found in terms of **median rent**! Interesting! 
+* **Population** of non-TOD tracts remained same level, but population of TOD tracts decreased and was smaller compared to non-TOD tracts all the way!
+* As indicated earlier, despite a slight increase of TOD- tracts in 2017,  percentage of **white group** did not change a lot.
 
-**Highlight: Even when adjusting for inflation, household income and rent increased everywhere, regardless of transit-status, and percentage of people in poverty decreased everywhere.**
 ```{r Grouped Bar Plot, echo=TRUE, message=FALSE, warning=FALSE}
 allTracts.Summary <- 
   st_drop_geometry(allTracts.group) %>%
@@ -426,14 +454,12 @@ allTracts.Summary %>%
 
 
 ### 4. Table Comparisons
-这里要具体谈一下数字，因为可以计算。
-We can compare these same values using a tables as well. While the visual change isn’t as clear, we are able to read the exact values. For example, the percentage of 18-24 year old residents with a bachelors degree increased from 1.8% to 2.5% in TOD areas but decreased from 1.3% to 1.2% in other areas.
+Despite being indirect in terms of visualization, the comparison table still serves as a good approach of extracting the exact values. Indicated in Table 4.1,
 
-We can also calculate the exact change in percent increase and see if things are increasing faster within TOD areas.
+* Although median rent of TOD tracts was lower compared to non-TOD tracts all the way, the increasing rate of TOD tracts is 5% higher (30% vs. 25% respectively), to some extent indicating a potential development.
+* Percentage of Bachelor Degree holder increased 36% in TOD tracts, while increased 17.2% in non-TOD tracts.
+* Median income increased 24% in TOD tracts, while increased 13.3% in non-TOD tracts.
 
-Highlight: With a 43% rise, rent is increasing at a greater rate in transit-oriented development vs non-TOD development (28% increase).
-
-Highlight: Population is also increasing at faster rate within transit-oriented areas vs non-transit-oriented areas (25% increase vs 17% increase, respectively)
 ```{r Comparison Table, echo=TRUE, message=FALSE, warning=FALSE}
 
 allTracts.Summary %>%
@@ -449,7 +475,8 @@ allTracts.Summary %>%
 
 
 ### 5. Graduated Symbol Maps
-We examined population and rent within 0.5 miles of each transit stop. We used an areal interpolation to estimate the population within 0.5 miles of each transit stop.
+We examined population and rent within 0.5 miles of each transit station. Generally speaking, distributions of populous areas and high rent areas might not be consistent. In terms of population, Victory Station (in the middle), Walnut Hill Station (Northwest), UNT Dallas Station (South) are sharing the three most population proportion, indicated in Figure 5.1. They are all relatively developed neighborhoods. When it comes to median rent, median rent in Downtown was comparatively higher compared to other areas, while rents of TOD tracts located along northeast Dallas were relatively higher as well. Accordingly, **there is no direct relationship between population and rent in TOD tracts.**
+
 
 ```{r selected stop, message=FALSE, warning=FALSE, include=FALSE}
 selected_stops <- 
@@ -463,6 +490,7 @@ join_data <-
   filter(!is.na(STA_NAME)) 
 
 ```
+
 
 #### 5.1 Population within 0.5 mile of each transit station
 ```{r Graduated symbol map of population, echo=TRUE, message=FALSE, warning=FALSE}
@@ -490,8 +518,6 @@ ggplot() +
 
 ```
 
-
-
 #### 5.2 Median rent within 0.5 mile of each transit station
 ```{r Graduated symbol maps of median rent, echo=TRUE, message=FALSE, warning=FALSE}
 rentByStation <-
@@ -516,14 +542,8 @@ ggplot() +
   theme(plot.title = element_text(color = "darkred", size=15, face="bold"))
 ```
 
-
-
 ### 6. Mean Rent as a function of distance to subway stations 
-Our next analysis looked at how average rent changes as a resident gets further from the nearest transit station. For each census tract, we calculated the max distance a tract is from a transit zone.
-
-Highlight: Even when adjusting for inflation, rent has increased between 2009 and 2017.
-
-Highlight: In 2009 and 2017, rent is at its lowest immediately near transit stations. There is a small and inconsistent rise in pricing as you move farther from transit. This may suggest that housing within transit-oriented development areas may be more accessible to more people.
+The distance to transit station was another factor to examine the effects of TOD on rent level. Generally speaking, rent level of 2017 was higher than 2009 all the time, but **the fluctuations of rent level with distance displayed a consistent pattern between 2009 and 2017**. In each respective year, rent level was lowest when station was around 2 miles away from houses, while the highest rent level occurred when  station was around 3 miles away from houses. Such a pattern might indicate that residents would not like to live so close to transit stations. 
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 allTracts.rings <-
@@ -560,7 +580,7 @@ ggplot(data = mean_RENT) +
 
 
 ### 7. Crime Rate, Transit Access and Rents
-Finally, we wanted to examine the relationship between TOD and crime and population.
+Finally, we specifically examined the burglary crime rate in Dallas and its relationships towards rent level and TOD. Since this project to some extent focused on house choices, we leveraged the case-level burglary crime data, and found that burglary of habitation was the most prevalent burglary crime in Dallas. This finding provided us with useful insights. Indicated in Figure 7.1, burglary seemingly was more likely to clustered in the areas with lower rent level, such as southwest Dallas. And indicated in Figure 7.2, except for Northwest Dallas, early all crimes clustered inside TOD tracts.
 
 ```{r Crime Data, echo=TRUE, message=FALSE, warning=FALSE}
 # 1. Load Crime-Burglary Data
@@ -586,7 +606,7 @@ geom_sf(data = st_union(tracts09))+
   theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 
 
-# 3. Plot Relation between Burglary and Transit
+# 3. Plot Relation between Burglary and TOD tracts
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09))+
   geom_sf(aes(fill = TOD)) +
@@ -602,9 +622,14 @@ ggplot(allTracts.group)+
   theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 ```
 
-
-
 ## IV. Conclusion and Recommandation
-To sum up, this analysis project has demonstrated the complex relationships that TOD can have on an evolving city.
+
+To sum up, this analysis project has demonstrated the complex relationships that TOD can have on an evolving city, Dallas. Although non-TOD areas take the lead in median rents, household income and population density compared to TOD areas, the increasing rates of those indicators are comparatively higher, indicating a trend that Dallas residents are willing to live alongside TOD areas and get access to transit system and potential benefits. Even if burglary crime is comparatively prevalent across TOD areas, residents’ enthusiasm is still there. Among all the indicators, the percentage of residents with Bachelor’ degree shares the largest proportion in the TOD tracts, indicating that TOD areas indeed provide better environment for highly-educated group. Hence, to some extent, it is safe to conclude that **residents in Dallas would like to pay more on rents for TOD.**
+
+Despite a plausible plan, the construction of TOD areas still needs to take up some challenges and address existing problems. For instance, it is necessary that City of Dallas should control the rapid increase of rent compared to the increase of household income, otherwise, despite being willing to live in TOD areas, residents cannot afford the crazy rent.
+
+For the further study, city planners and policy makers should leverage **zoning ordinances** to help to incentivize TOD in areas that are considered strong candidates, and also take residents household sizes and types into consideration. Meanwhile, it’s also worth paying attention to the **spatial biases** could have on the result of this project since the areas of high rent could be clustering for reasons completely unrelated to transit development but to other policy-driven reasons. 
+
+
 
 

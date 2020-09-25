@@ -8,3 +8,24 @@ output: html_document
 * Emma
   + Emma
     - Emma
+
+[3.8%](https://assets.dmagstatic.com/wp-content/uploads/2020/04/Presentation-1.pdf) of Dallas residents commute via public transit while [50,000](https://assets.dmagstatic.com/wp-content/uploads/2020/04/Presentation-1.pdf) Dallas residents commute over an hour each way to/from work. 
+
+Transit-Oriented Development, or TOD for short, is at the heart of the City of Dallas' long-range land use plan, [*forward*Dallas!]( https://dallascityhall.com/departments/pnv/strategic-planning/Pages/forward-dallas.aspx). Dallas is home to 74 passenger rail stations in the system of [Dallas Area Rapid Transit (DART)](https://en.wikipedia.org/wiki/Dallas_Area_Rapid_Transit), and each presenting a unique opportunity to develop a new mixed-use neighborhood. DART is a transit agency serving the Dallas–Fort Worth metroplex of Texas. It operates buses, light rail, commuter rail, and high-occupancy vehicle lanes in Dallas and twelve of its suburbs. DART reported the [92,000]( https://web.archive.org/web/20200523094728/https://www.apta.com/wp-content/uploads/2019-Q4-Ridership-APTA.pdf) average weekday riders in 4th quarter of 2019. In terms of the commute situation of residents in Dallas, [3.8%](https://assets.dmagstatic.com/wp-content/uploads/2020/04/Presentation-1.pdf) of Dallas residents commute via public transit while [50,000](https://assets.dmagstatic.com/wp-content/uploads/2020/04/Presentation-1.pdf) Dallas residents commute over an hour each way to/from work. 
+
+When DART originally proposed the system back in the 1980s, the hope was that new rail stations would spur on new developments of dense housing and commercial real estate. And so far, a new [study]( https://www.dart.org/about/economicimpact.asp) has just shown how productive and important DART is to the overall North Texas economy, generating billions of dollars in revenue, taxes and jobs.
+
+Accordingly, this project is aimed at provide an overview on whether residents would like to pay more for the sake of the potential benefits from TOD in Dallas.
+
+Although non-TOD areas take the lead in median rents, household income and population density compared to TOD areas, the increasing rates of those indicators are comparatively higher, indicating a trend that Dallas residents are willing to live alongside TOD areas and get access to transit system and potential benefits. Even if burglary crime is comparatively prevalent across TOD areas, residents’ enthusiasm is still there. Among all the indicators, t
+
+
+
+To sum up, this analysis project has demonstrated the complex relationships that TOD can have on an evolving city, Dallas. Although non-TOD areas take the lead in median rents, household income and population density compared to TOD areas, the increasing rates of those indicators are comparatively higher, indicating a trend that Dallas residents are willing to live alongside TOD areas and get access to transit system and potential benefits. Even if burglary crime is comparatively prevalent across TOD areas, residents’ enthusiasm is still there. Among all the indicators, the percentage of residents with Bachelor’ degree shares the largest proportion in the TOD tracts, indicating that TOD areas indeed provide better environment for highly-educated group. Hence, to some extent, it is safe to conclude that **residents in Dallas would like to pay more on rents for TOD**.
+
+Despite a plausible plan, the construction of TOD areas still needs to take up some challenges and address existing problems. For instance, it is necessary that City of Dallas should control the rapid increase of rent compared to the increase of household income, otherwise, despite being willing to live in TOD areas, residents cannot afford the crazy rent.
+
+For the further study, city planners and policy makers should leverage **zoning ordinances** to help to incentivize TOD in areas that are considered strong candidates, and also take residents household sizes and types into consideration. Meanwhile, it’s also worth paying attention to the **spatial biases** could have on the result of this project since the areas of high rent could be clustering for reasons completely unrelated to transit development but to other policy-driven reasons. 
+
+
+
