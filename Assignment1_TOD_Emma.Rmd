@@ -7,14 +7,19 @@ output:
     code_folding: hide
 ---
 
-# I. Introduction & Motivation
+## I. Introduction & Motivation
 
 
 
 
-# II. Setup: Set parameters and load libraries
-### 1. Load Libraries
-```{r Setup, echo=TRUE, message=FALSE, warning=FALSE}
+## II. Setup
+我把这个部分的标题都删掉了，因为这些setup没必要展示在final deliverable里面。
+
+
+In this section, we loaded necessary libraries, created plot theme options and map theme options, and identified functions for quintile breaks.
+
+```{r Load Libraries, echo=TRUE, message=FALSE, warning=FALSE}
+# 1. load Libraries
 knitr::opts_chunk$set(echo = TRUE)
 options(scipen=999)
 
@@ -27,11 +32,7 @@ library(grid)
 library(knitr)
 library(kableExtra)
 library(rmarkdown)
-```
 
-### 2. Load Styling Options
-
-```{r Theme Function}
 mapTheme <- function(base_size = 12) {
   theme(
     text = element_text( color = "black"),
@@ -71,12 +72,7 @@ plotTheme <- function(base_size = 12) {
   )
 }
 
-
-```
-
-### 3. Functions Preparation
-```{r Quantile Break, echo=TRUE, message=FALSE, warning=FALSE}
-
+# 3. Identify functions
 qBr <- function(df, variable, rnd) {
   if (missing(rnd)) {
     as.character(quantile(round(df[[variable]],0),
@@ -174,23 +170,22 @@ multipleRingBuffer <- function(inputPolygon, maxDistance, interval)
 
 palette5 <- c("#CCCCFF","#CC99FF","#9966CC","#663399","#330066")
 
-```
-### 4. Load Census API key
-```{r Other setup}
-knitr::opts_chunk$set(
-	echo = TRUE,
-	message = FALSE,
-	warning = FALSE
-)
+# Load API
 census_api_key("a7edab3d7c3df571998caab5a3cc12a4ec8d8b61" , overwrite  = TRUE)
 
 ```
 
 
-# III. Data Manipulation and Visualization
-## 1. Data Wrangling
-### 1.1 Fetch Census Data
-```{r Census Data, message=FALSE, warning=FALSE}
+## III. Data Manipulation and Visualization
+### 1. Data Wrangling
+这里介绍dataset
+
+
+#### 1.1 Fetch Census Data
+
+这里介绍选择什么year census data 以及什么变量
+
+```{r Census Data, message=FALSE, warning=FALSE, results = FALSE}
 
 # ---- 2009 Census Data -----
 tracts09 <-  
@@ -251,7 +246,7 @@ allTracts <- rbind(tracts09,tracts17)
 ```
 
 
-### 1.2 Load Transit Data 
+#### 1.2 Load Dallas Transit Data 
 ```{r Transit Data, message=FALSE, warning=FALSE, include=FALSE}
 # Load Dallas Boundary Data
 Dallas <- st_read('https://www.dallasopendata.com/api/geospatial/mn9w-m2tp?method=export&format=GeoJSON')
@@ -281,8 +276,8 @@ ggplot() +
   
 ```
 
-### 1.3 Create Buffers
-```{r Create Buffers, echo=TRUE, message=FALSE, warning=FALSE}
+#### 1.3 Identifying TOD Tracts
+```{r Create buffers and select tracts, echo=TRUE, message=FALSE, warning=FALSE, results = FALSE}
 D_Buffers <- 
   rbind(
     st_buffer(D_Stops, 2640) %>%
@@ -302,10 +297,8 @@ selectCentroids <-
   mutate(Selection_Type = "Select by Centroids")
 
 head(selectCentroids,5)
-```
 
-### 1.4 Census Data in Group by TODs
-```{r Tracts in group, echo=TRUE}
+# Census Data in Group by TODs
 allTracts.group <- 
   rbind(
     st_centroid(allTracts)[buffer,] %>%
@@ -320,10 +313,7 @@ allTracts.group <-
       mutate(TOD = "Non-TOD")) %>%
   mutate(MedRent.inf = ifelse(year == "2009", MedRent * 1.14, MedRent))  # inflation
 
-```
-
-### 1.5 TOD and Non-TOD between 2009 and 2017
-```{r TOD vs. Non-TOD, echo=TRUE, message=FALSE, warning=FALSE}
+# TOD and Non-TOD between 2009 and 2017
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09))+
   geom_sf(aes(fill = TOD)) +
@@ -335,8 +325,9 @@ ggplot(allTracts.group)+
   theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 ```
 
-## 2. TOD vs. Non-TOD: Four Variables
-### 2.1 Median Rent Comparison between 2009 and 2017 
+
+### 2. Changes in Census Variables Over Time and Space
+#### 2.1 Median Rent Comparison between 2009 and 2017 
 ```{r Median Rent, echo=TRUE, message=FALSE, warning=FALSE}
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09))+
@@ -353,7 +344,7 @@ ggplot(allTracts.group)+
 ```
 
 
-### 2.2 Percentage of White Group between 2009 and 2017 
+#### 2.2 Percentage of White Group between 2009 and 2017 
 ```{r Percentage of White Group, echo=TRUE, message=FALSE, warning=FALSE}
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09)) +
@@ -370,7 +361,7 @@ ggplot(allTracts.group)+
 ```
 
 
-### 2.3 Bachelor Degree Comparison between 2009 and 2017
+#### 2.3 Bachelor Degree Comparison between 2009 and 2017
 ```{r Bachelor Degree, echo=TRUE, message=FALSE, warning=FALSE}
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09))+
@@ -388,7 +379,7 @@ ggplot(allTracts.group)+
 
 
 
-### 2.4 Median Household Income Comparison between 2009 and 2017
+#### 2.4 Median Household Income Comparison between 2009 and 2017
 ```{r Median Household Income, echo=TRUE, message=FALSE, warning=FALSE}
 ggplot(allTracts.group)+
   geom_sf(data = st_union(tracts09))+
@@ -404,7 +395,12 @@ ggplot(allTracts.group)+
   theme(plot.title = element_text(color = "darkred", size=15, face="bold")) 
 ```
 
-## 3. Grouped Bar Plot
+### 3. Bar Plot Comparisons
+We can examine these same variables over time using a barplot to more precisely compare the values within and outside of transit-oriented development tracts. Rent was and household income were adjusted for inflation.
+
+**Highlight: Percentage of people with a bachelor’s degree and % of white people increased in transit areas between 2009-2017 but stayed at similar levels outside of these areas.**
+
+**Highlight: Even when adjusting for inflation, household income and rent increased everywhere, regardless of transit-status, and percentage of people in poverty decreased everywhere.**
 ```{r Grouped Bar Plot, echo=TRUE, message=FALSE, warning=FALSE}
 allTracts.Summary <- 
   st_drop_geometry(allTracts.group) %>%
@@ -429,7 +425,15 @@ allTracts.Summary %>%
 ```
 
 
-## 4. Comparison Table
+### 4. Table Comparisons
+这里要具体谈一下数字，因为可以计算。
+We can compare these same values using a tables as well. While the visual change isn’t as clear, we are able to read the exact values. For example, the percentage of 18-24 year old residents with a bachelors degree increased from 1.8% to 2.5% in TOD areas but decreased from 1.3% to 1.2% in other areas.
+
+We can also calculate the exact change in percent increase and see if things are increasing faster within TOD areas.
+
+Highlight: With a 43% rise, rent is increasing at a greater rate in transit-oriented development vs non-TOD development (28% increase).
+
+Highlight: Population is also increasing at faster rate within transit-oriented areas vs non-transit-oriented areas (25% increase vs 17% increase, respectively)
 ```{r Comparison Table, echo=TRUE, message=FALSE, warning=FALSE}
 
 allTracts.Summary %>%
@@ -441,13 +445,11 @@ allTracts.Summary %>%
   kable_styling() %>%
   footnote(general_title = "\n",
            general = "Table 4.1")
-
 ```
 
 
-
-
-## 5. Graduated Symbol Maps
+### 5. Graduated Symbol Maps
+We examined population and rent within 0.5 miles of each transit stop. We used an areal interpolation to estimate the population within 0.5 miles of each transit stop.
 
 ```{r selected stop, message=FALSE, warning=FALSE, include=FALSE}
 selected_stops <- 
@@ -462,7 +464,7 @@ join_data <-
 
 ```
 
-### 5.1 Population within 0.5 mile of each transit station
+#### 5.1 Population within 0.5 mile of each transit station
 ```{r Graduated symbol map of population, echo=TRUE, message=FALSE, warning=FALSE}
 popByStation <-
   join_data %>% 
@@ -475,12 +477,10 @@ popByStation <-
 popByStation_sf <- popByStation %>%
   st_sf()
 
-Dallas <- st_read('https://www.dallasopendata.com/api/geospatial/mn9w-m2tp?method=export&format=GeoJSON')
-
 ggplot() + 
   geom_sf(data = Dallas, fill = 'lightgrey') +
   geom_sf(data = popByStation_sf, aes(size = `Total Population`), color = '#5e9bb2') +
-  labs(title = "Graduated Symbol Map: \nPopulation within 0.5 Mile of Each Transit Station" ,
+  labs(title = "Graduated Symbol Map I: \nPopulation within 0.5 Mile of Each Transit Station" ,
        subtitle = '',
        caption = "Figure 5.1", 
        fill = 'Total Population') +
@@ -492,7 +492,7 @@ ggplot() +
 
 
 
-### 5.2 Median rent within 0.5 mile of each transit station
+#### 5.2 Median rent within 0.5 mile of each transit station
 ```{r Graduated symbol maps of median rent, echo=TRUE, message=FALSE, warning=FALSE}
 rentByStation <-
   join_data %>%
@@ -508,7 +508,7 @@ rentByStation_sf <- rentByStation %>%
 ggplot() + 
   geom_sf(data = Dallas, fill = 'lightgrey') +
   geom_sf(data = rentByStation_sf, aes(size = `Median Rent`), color = '#c2a7ef')  +  
-  labs(title = "Graduated Symbol Map: \nMedian Rent within 0.5 Mile of Each Transit Station",
+  labs(title = "Graduated Symbol Map II: \nMedian Rent within 0.5 Mile of Each Transit Station",
        subtitle = '',
        caption = "Figure 5.2") +
   plotTheme() + 
@@ -518,7 +518,13 @@ ggplot() +
 
 
 
-## 6. Rent as a function of distance to subway stations 
+### 6. Mean Rent as a function of distance to subway stations 
+Our next analysis looked at how average rent changes as a resident gets further from the nearest transit station. For each census tract, we calculated the max distance a tract is from a transit zone.
+
+Highlight: Even when adjusting for inflation, rent has increased between 2009 and 2017.
+
+Highlight: In 2009 and 2017, rent is at its lowest immediately near transit stations. There is a small and inconsistent rise in pricing as you move farther from transit. This may suggest that housing within transit-oriented development areas may be more accessible to more people.
+
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 allTracts.rings <-
   st_join(st_centroid(dplyr::select(allTracts, GEOID, year)), 
@@ -553,8 +559,10 @@ ggplot(data = mean_RENT) +
 
 
 
-## 7. Crime Rate, Transit Access and Rents
-```{r Crime Data, echo=FALSE, message=FALSE, warning=FALSE}
+### 7. Crime Rate, Transit Access and Rents
+Finally, we wanted to examine the relationship between TOD and crime and population.
+
+```{r Crime Data, echo=TRUE, message=FALSE, warning=FALSE}
 # 1. Load Crime-Burglary Data
 crime_dat <- read.csv('Dallas_Crime_Data.CSV')
 
@@ -596,7 +604,7 @@ ggplot(allTracts.group)+
 
 
 
-# IV. Conclusion and Recommandation
-
+## IV. Conclusion and Recommandation
+To sum up, this analysis project has demonstrated the complex relationships that TOD can have on an evolving city.
 
 
