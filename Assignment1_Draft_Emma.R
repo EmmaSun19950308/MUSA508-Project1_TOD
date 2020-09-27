@@ -3,60 +3,7 @@
 # Percentage Bachelor legend 
 
 
-# Question:
-# 4. When and how to submit assignment? 
-# 5. Graduated symbol plot must need longitude and latitude?
-#    How to understand geometry? Relation between XY coordinate, between lon&lat?
-new_buffer <- 
-  st_transform(D_Stops,('EPSG:32138')) %>%
-  st_union(st_buffer(D_Stops, 2640)) %>%
-  st_sf() %>%
-  dplyr::select(STA_NAME)
 
-join_data <- 
-  st_join(tracts17, new_buffer) %>%
-  filter(!is.na(STA_NAME))
-
-popByStation <-
-  join_data %>% 
-  group_by(STA_NAME) %>%
-  summarize(sumPop = sum(TotalPop)) 
-
-Dallas <- st_read('https://www.dallasopendata.com/api/geospatial/mn9w-m2tp?method=export&format=GeoJSON')
-
-ggplot() + 
-  geom_sf(data = Dallas, fill = 'grey') +
-  geom_sf(data = popByStation, aes(size = sumPop)) 
-
-# 6. Why only looked at tracts09 when combining transit data？
-D_Stops <- 
-  st_read('https://opendata.arcgis.com/datasets/65b609c50cba44c19cfbaa2a0251a8ae_0.geojson') %>% 
-  mutate(Line = "Dallas Transit") %>%
-  select(STA_NAME) %>%
-  st_transform(st_crs(tracts09))  
-
-# Same question on select centroid
-selectCentroids <-
-  st_centroid(tracts09)[buffer,] %>%
-  st_drop_geometry() %>%
-  left_join(dplyr::select(tracts09, GEOID)) %>%
-  st_sf() %>%
-  dplyr::select(TotalPop) %>%
-  mutate(Selection_Type = "Select by Centroids")
-
-# So for graduated symbol plot, should I use tracts17 or tracts09?
-
-# 8. How to understand st_drop_geometry() and st_sf()
-selectCentroids <-
-  st_centroid(tracts09)[buffer,] %>%
-  st_drop_geometry() %>%
-  left_join(dplyr::select(tracts09, GEOID)) %>%
-  st_sf() %>%
-  dplyr::select(TotalPop) %>%
-  mutate(Selection_Type = "Select by Centroids")
-
-# Markdown output has R console and from Line 375 markdown cannot be knitted to html
-# Policy brief inside markdown
 
 
 # load Libraries
